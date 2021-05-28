@@ -1,0 +1,64 @@
+import vk_api
+import psycopg2
+import time
+
+class AllFr:
+    @staticmethod
+    def show():
+        pass
+
+class AllFr:
+    def show_more():
+        cur.execute("SELECT * FROM FRIENDLIST")
+        rows = cur.fetchall()
+        return rows
+
+AllFr.show = staticmethod(AllFr.show_more)
+
+def dr():
+    vk_session = vk_api.VkApi('login', 'pasword')
+    vk_session.auth()
+    vk = vk_session.get_api()
+    m = vk.friends.get(fields='nickname')
+    k = []
+    for i in range(m['count']):
+        b = [m['items'][i]['id'], m['items'][i]['first_name'], m['items'][i]['last_name']]
+        k.append(b)
+    return k
+
+friend_list = dr()
+
+con = psycopg2.connect(
+    database="OKK",
+    user="postgres",
+    password="",
+    host="127.0.0.1",
+    port="5432"
+)
+
+cur = con.cursor()
+cur.execute('''CREATE TABLE FRIENDLIST  
+     (ADMISSION INT NOT NULL,
+     NAME TEXT NOT NULL,
+     SURNAME TEXT NOT NULL);''')
+
+for i in range(len(friend_list)):
+    cur.execute("INSERT INTO FRIENDLIST (admission, name, surname) VALUES(%s,%s,%s)", friend_list[i])
+
+
+while True:
+
+    time.sleep(86400)
+
+    new_list= dr()
+    old_list = friend_list
+
+    for i in range(len(new_list)):
+      if new_list[i] not in old_list:
+        cur.execute("INSERT INTO FRIENDLIST (admission, name, surname) VALUES(%s,%s,%s)", friend_list[i])
+
+    friend_list = new_list
+
+
+con.commit()
+con.close()
