@@ -16,7 +16,7 @@ class AllFr:
 AllFr.show = staticmethod(AllFr.show_more)
 
 def dr():
-    vk_session = vk_api.VkApi('login', 'pasword')
+    vk_session = vk_api.VkApi('login', 'password')
     vk_session.auth()
     vk = vk_session.get_api()
     m = vk.friends.get(fields='nickname')
